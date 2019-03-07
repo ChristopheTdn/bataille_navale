@@ -19,12 +19,16 @@ class Core():
         self.grille_joueur_bateau = dict()
         self.grille_joueur_cherche = dict()
         self.list_bateaux_cpu = []
+        self.list_bateaux_joueur = []
         self.largeur = largeur
         self.largeur_string = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"[0:self.largeur]
         self.hauteur = hauteur
-        # remplir grille de .
+        # rempli les mers de vide (".")
         self.init_grilles()
-        self.crea_grille_cpu()
+        #place les bateaux du CPU et du joueur
+        self.crea_grille(self.grille_cpu_bateau, self.list_bateaux_cpu)
+        self.crea_grille(self.grille_joueur_bateau, self.list_bateaux_joueur)
+
 
     def init_grilles(self):
         for j in range(1, self.hauteur+1):
@@ -34,22 +38,22 @@ class Core():
                 self.grille_joueur_bateau[(i, j)] = "."
                 self.grille_joueur_cherche[(i, j)] = "."
 
-    def crea_grille_cpu(self):
+    def crea_grille(self,grille,liste):
         bateau1 = Bateau("P", "Porte-Avions", 6)
-        bateau1.place_bateau(self.grille_cpu_bateau, self.largeur, self.hauteur)
+        bateau1.place_bateau(grille, self.largeur, self.hauteur)
         bateau2 = Bateau("D", "Destroyer", 5)
-        bateau2.place_bateau(self.grille_cpu_bateau,self.largeur, self.hauteur)
+        bateau2.place_bateau(grille, self.largeur, self.hauteur)
         bateau3 = Bateau("C", "Corvette", 4)
-        bateau3.place_bateau(self.grille_cpu_bateau,self.largeur, self.hauteur)
+        bateau3.place_bateau(grille, self.largeur, self.hauteur)
         bateau4 = Bateau("S", "Sous-Marin", 3)
-        bateau4.place_bateau(self.grille_cpu_bateau,self.largeur, self.hauteur)
+        bateau4.place_bateau(grille, self.largeur, self.hauteur)
         bateau5 = Bateau("E", "Escorteur", 2)
-        bateau5.place_bateau(self.grille_cpu_bateau, self.largeur, self.hauteur)
-        self.list_bateaux_cpu.append(bateau1)
-        self.list_bateaux_cpu.append(bateau2)
-        self.list_bateaux_cpu.append(bateau3)
-        self.list_bateaux_cpu.append(bateau4)
-        self.list_bateaux_cpu.append(bateau5)
+        bateau5.place_bateau(grille, self.largeur, self.hauteur)
+        liste.append(bateau1)
+        liste.append(bateau2)
+        liste.append(bateau3)
+        liste.append(bateau4)
+        liste.append(bateau5)
 
     def affiche(self, grille):
         """Affiche la grille passée en parametre
@@ -99,7 +103,8 @@ class Core():
 
         self.affiche(self.grille_joueur_cherche)
         print("")
-        print (reponse)
+        print(reponse)
+        input ('Cliquez sur ENTRER que je tir a mon tour...')
 
 
 
@@ -125,4 +130,5 @@ if __name__ == "__main__":
     game.affiche(game.grille_joueur_cherche)
     while "jeu_en_cours":
         game.salve()
+
             

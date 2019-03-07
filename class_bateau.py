@@ -5,7 +5,7 @@ class Bateau():
     """
 
     def __init__(self, name, long_name, taille):
-        """Initialise  la class Bateau
+        """Initialise  la classe Bateau
         
         Arguments:
             name {str} -- nom du bateau
@@ -18,12 +18,6 @@ class Bateau():
         self.taille = taille
         self.position = []
         self.integrite = []
-    
-    def test_integrite(self):
-        if len(self.integrite) == 0:
-            return (self.long_name + " coulé !!!")
-        else:
-            return (self.long_name + " touché !!!")
 
     def place_bateau (self, grille,largeur,hauteur):
         import random
@@ -63,7 +57,6 @@ class Bateau():
         
         Arguments:
             tir {str} -- sous la forme LETTRENOMBRE, la lettre va de A a Z et le nombre de 1 a 26
-                         gestion de l'exception si les coordonnées sont mal entrées
         '''
         if tir in self.integrite:
            self.integrite.remove(tir)
