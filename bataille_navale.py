@@ -55,28 +55,56 @@ class Core():
         liste.append(bateau4)
         liste.append(bateau5)
 
-    def affiche(self, grille):
+    def affiche(self, grille, grille2=None):
         """Affiche la grille passée en parametre
         
         Arguments:
             grille {dict} -- Un dictionnaire au format (A,1) = "." pour la mer
         """
-        print('\x1b[2J') #cls
-        print ("    ",end="")
+        print('\x1b[2J')  #cls
+        # GRILLE 1
+        print(GREEN + "   | ", end="")
         for i in self.largeur_string:
-            print (GREEN + i + "  ",end="")
+            print(GREEN + " " + i + " ", end="")
+        # GRILLE 2
+        print('   ', end="")
+        print(GREEN + "   | ", end="")
+        for i in self.largeur_string:
+            print(GREEN + " " + i + " ", end="")
+            
+        print("")
+        # GRILLE 1
+        print(GREEN + "---|-", end="")
+        for i in self.largeur_string:
+            print(GREEN + "---", end="")
+        print("   ", end="")
+        # GRILLE 2
+        print(GREEN + "---|-", end="")
+        for i in self.largeur_string:
+            print(GREEN + "---", end="")
+            
         for j in range(self.hauteur):
             print("")
-            print (GREEN + "{0:2d}".format(j + 1)+" ",end="")
+            print (GREEN + "{0:2d}".format(j + 1)+" | ",end="")
             for i in self.largeur_string:
                 couleur= RED               
                 if grille[(i, j + 1)]=="X" :
                     couleur = BLUE
                 if grille[(i, j + 1)]=="." :
                     couleur = CYAN
-                print(couleur,grille[(i, j + 1)]+" ", end='')
-        print("")
-        print ("")
+                print(couleur, grille[(i, j + 1)] + " ", end='')
+            # GRILLE2
+            print("   ",end="")
+            print (GREEN + "{0:2d}".format(j + 1)+" | ",end="")
+            for i in self.largeur_string:
+                couleur= RED               
+                if grille2[(i, j + 1)]=="X" :
+                    couleur = BLUE
+                if grille2[(i, j + 1)]=="." :
+                    couleur = CYAN
+                print(couleur, grille2[(i, j + 1)] + " ", end='')
+
+        print("\n")
         for bateau in self.list_bateaux_cpu:
             print(bateau.long_name, " (", len(bateau.integrite), "/", bateau.taille," cases)",sep="")
                     
@@ -101,11 +129,9 @@ class Core():
             reponse = CYAN + "A l eau..."
             self.grille_joueur_cherche[(X, Y)] = "X"
 
-        self.affiche(self.grille_joueur_cherche)
+        self.affiche(self.grille_joueur_cherche,self.grille_joueur_bateau)
         print("")
         print(reponse)
-        input ('Cliquez sur ENTRER que je tir a mon tour...')
-
 
 
 if __name__ == "__main__":
@@ -127,7 +153,7 @@ if __name__ == "__main__":
     RESET = Fore.RESET
 
     game = Core(12,12)
-    game.affiche(game.grille_joueur_cherche)
+    game.affiche(game.grille_joueur_cherche,game.grille_joueur_bateau)
     while "jeu_en_cours":
         game.salve()
 
