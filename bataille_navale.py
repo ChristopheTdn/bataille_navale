@@ -1,7 +1,7 @@
 """
 Bataille Navale
 
-Petit jeu console pour s'entrainer un peu.
+Petit jeu console pour s'entrainer un peu
 
 Auteur : ToF
 years : 2019
