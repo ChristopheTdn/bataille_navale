@@ -1,11 +1,15 @@
 """
 Bataille Navale
 
-Petit jeu console pour s'entrainer un peu
+Petit jeu console pour s'entrainer un peu.
 
 Auteur : ToF
 years : 2019
 """
+# import
+import random
+from colorama import init, Fore
+init()
 
 # class
 
@@ -15,6 +19,7 @@ class Core():
      Creation du coeur de jeu Bataille navale
 
     """
+
     def __init__(self, largeur=10, hauteur=10):
         self.grille_cpu_bateau = dict()
         self.grille_cpu_cherche = dict()
@@ -79,7 +84,6 @@ class Core():
         for i in self.largeur_string:
             print(GREEN + "---", end="")
         print("   ", end="")
-
         # GRILLE 2
         print(GREEN + "---|-", end="")
         for i in self.largeur_string:
@@ -111,37 +115,60 @@ class Core():
             print(bateau.long_name, " (", len(bateau.integrite),
                   "/", bateau.taille, " cases)", sep="")
 
-    def salve(self):
+    def round(self):
+        '''
+         Chaque tour un tir du joueur et un tir du CPU
+        '''
+        # Le JOUEUR COMMENCE
 
-        print(WHITE + "\nEntrer votre salve: ", end="")
-        tir = input()
+        tir_joueur = False
+        while not tir_joueur:
+            print(WHITE + "\nEntrer votre salve: ", end="")
+            tir = input()
         # parse tir
-        try:
-            tir = tir.upper()
-            X = tir[0]
-            Y = int(tir[1:])
-        except:
-            print("Erreur de coordonnée !!!")
-            return
+            try:
+                tir = tir.upper()
+                X = tir[0]
+                Y = int(tir[1:])
+                tir_joueur = True
+            except:
+                self.affiche(self.grille_joueur_cherche,
+                             self.grille_joueur_bateau)
+                print(RED + "Erreur de coordonnée !!!")
+
+        reponse_joueur = (self.salve(
+            X, Y, self.list_bateaux_cpu, self.grille_joueur_cherche))
+
+        # Le CPU JOUE
+        tir_cpu = False
+        while not tir_cpu:
+            X = self.largeur_string[random.randint(0, self.largeur-1)]
+            Y = random.randint(1, self.hauteur)
+            tir_cpu = True
+
+        reponse_CPU = " | Tir CPU en " + X + str(Y) + " >>  " + (self.salve(
+            X, Y, self.list_bateaux_joueur, self.grille_cpu_cherche))
+
+        self.affiche(self.grille_joueur_cherche, self.grille_joueur_bateau)
+
+        print("")
+        print(reponse_joueur, reponse_CPU)
+
+    def salve(self, X, Y, liste, grille):
+
         reponse = ""
-        for bateau in self.list_bateaux_cpu:
+        tir = X + str(Y)
+        for bateau in liste:
             if tir in bateau.position:
-                self.grille_joueur_cherche[(X, Y)] = bateau.name
+                grille[(X, Y)] = bateau.name
                 reponse = RED + bateau.test_tir(tir)
         if reponse == "":
             reponse = CYAN + "A l eau..."
-            self.grille_joueur_cherche[(X, Y)] = "X"
-
-        self.affiche(self.grille_joueur_cherche, self.grille_joueur_bateau)
-        print("")
-        print(reponse)
+            grille[(X, Y)] = "X"
+        return reponse
 
 
 if __name__ == "__main__":
-
-    # import
-    from colorama import init, Fore
-    init()
 
     # CONSTANTES
 
@@ -157,4 +184,4 @@ if __name__ == "__main__":
     game = Core(12, 12)
     game.affiche(game.grille_joueur_cherche, game.grille_joueur_bateau)
     while "jeu_en_cours":
-        game.salve()
+        game.round()
