@@ -1,7 +1,7 @@
 """
 Bataille Navale
 
-Petit jeu console pour s'entrainer un peu.
+Petit jeu console pour s'entrainer un peu
 
 Auteur : ToF
 years : 2019
@@ -16,7 +16,7 @@ init()
 
 class Core():
     """
-     Creation du coeur de jeu Bataille navale
+     Création du coeur de jeu Bataille navale
 
     """
 
@@ -62,7 +62,7 @@ class Core():
         liste.append(bateau5)
 
     def affiche(self, grille, grille2=None):
-        """Affiche la grille passée en parametre
+        """Affiche les grilles passées en parametre
 
         Arguments:
             grille {dict} -- Un dictionnaire au format (A,1) = "." pour la mer
@@ -85,9 +85,10 @@ class Core():
             print(GREEN + "---", end="")
         print("   ", end="")
         # GRILLE 2
-        print(GREEN + "---|-", end="")
-        for i in self.largeur_string:
-            print(GREEN + "---", end="")
+        if grille2 is not None:
+            print(GREEN + "---|-", end="")
+            for i in self.largeur_string:
+                print(GREEN + "---", end="")
 
         for j in range(self.hauteur):
             print("")
@@ -100,15 +101,16 @@ class Core():
                     couleur = CYAN
                 print(couleur, grille[(i, j + 1)] + " ", end='')
             # GRILLE2
-            print("   ", end="")
-            print(GREEN + "{0:2d}".format(j + 1)+" | ", end="")
-            for i in self.largeur_string:
-                couleur = RED
-                if grille2[(i, j + 1)] == "X":
-                    couleur = BLUE
-                if grille2[(i, j + 1)] == ".":
-                    couleur = CYAN
-                print(couleur, grille2[(i, j + 1)] + " ", end='')
+            if grille2 is not None:
+                print("   ", end="")
+                print(GREEN + "{0:2d}".format(j + 1)+" | ", end="")
+                for i in self.largeur_string:
+                    couleur = RED
+                    if grille2[(i, j + 1)] == "X":
+                        couleur = BLUE
+                    if grille2[(i, j + 1)] == ".":
+                        couleur = CYAN
+                    print(couleur, grille2[(i, j + 1)] + " ", end='')
 
         print("\n")
         for bateau in self.list_bateaux_cpu:
@@ -133,7 +135,7 @@ class Core():
                 tir_joueur = True
             except:
                 self.affiche(self.grille_joueur_cherche,
-                             self.grille_joueur_bateau)
+                             self.grille_cpu_cherche)
                 print(RED + "Erreur de coordonnée !!!")
 
         reponse_joueur = (self.salve(
@@ -144,12 +146,16 @@ class Core():
         while not tir_cpu:
             X = self.largeur_string[random.randint(0, self.largeur-1)]
             Y = random.randint(1, self.hauteur)
-            tir_cpu = True
+            if self.grille_cpu_cherche[(X, Y)] == ".":
+                tir_cpu = True
 
-        reponse_CPU = " | Tir CPU en " + X + str(Y) + " >>  " + (self.salve(
-            X, Y, self.list_bateaux_joueur, self.grille_cpu_cherche))
+        reponse_CPU = WHITE + " | Tir CPU en " + \
+            CYAN + X + str(Y) + \
+            WHITE + ">>  " + CYAN + \
+            self.salve(X, Y, self.list_bateaux_joueur,
+                       self.grille_cpu_cherche)
 
-        self.affiche(self.grille_joueur_cherche, self.grille_joueur_bateau)
+        self.affiche(self.grille_joueur_cherche, self.grille_cpu_cherche)
 
         print("")
         print(reponse_joueur, reponse_CPU)
