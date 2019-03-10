@@ -45,21 +45,21 @@ class Core():
                 self.grille_joueur_cherche[(i, j)] = "."
 
     def crea_grille(self, grille, liste):
-        bateau1 = Bateau("P", "Porte-Avions", 6)
-        bateau1.place_bateau(grille, self.largeur, self.hauteur)
-        bateau2 = Bateau("D", "Destroyer", 5)
-        bateau2.place_bateau(grille, self.largeur, self.hauteur)
-        bateau3 = Bateau("C", "Corvette", 4)
-        bateau3.place_bateau(grille, self.largeur, self.hauteur)
-        bateau4 = Bateau("S", "Sous-Marin", 3)
-        bateau4.place_bateau(grille, self.largeur, self.hauteur)
-        bateau5 = Bateau("E", "Escorteur", 2)
-        bateau5.place_bateau(grille, self.largeur, self.hauteur)
-        liste.append(bateau1)
-        liste.append(bateau2)
-        liste.append(bateau3)
-        liste.append(bateau4)
-        liste.append(bateau5)
+        """
+        Création de la grille a l'aide de l'Objet Bateau
+
+        Arguments:
+            grille {[dict]} -- Un dictionnaire au format (A,1) = "."
+            liste {[list]} -- La liste des objets 'Bateau' placé sur la grille.
+        """
+
+        liste.extend([Bateau("P", "Porte-Avions", 6),
+                      Bateau("D", "Destroyer", 5),
+                      Bateau("C", "Corvette", 4),
+                      Bateau("S", "Sous-Marin", 3),
+                      Bateau("E", "Escorteur", 2)])
+        for bateau in liste:
+            bateau.place_bateau(grille, self.largeur, self.hauteur)
 
     def affiche(self, grille, grille2=None):
         """Affiche les grilles passées en parametre
@@ -133,7 +133,7 @@ class Core():
                 X = tir[0]
                 Y = int(tir[1:])
                 tir_joueur = True
-            except:
+            except ValueError:
                 self.affiche(self.grille_joueur_cherche,
                              self.grille_cpu_cherche)
                 print(RED + "Erreur de coordonnée !!!")
