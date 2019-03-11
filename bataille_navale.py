@@ -25,6 +25,8 @@ class Core():
         self.grille_cpu_cherche = dict()
         self.grille_joueur_bateau = dict()
         self.grille_joueur_cherche = dict()
+        self.liste_cpu_jouable = []
+        self.liste_cible_ia = []
         self.list_bateaux_cpu = []
         self.list_bateaux_joueur = []
         self.largeur = largeur
@@ -41,6 +43,7 @@ class Core():
             for i in self.largeur_string:
                 self.grille_cpu_bateau[(i, j)] = "."
                 self.grille_cpu_cherche[(i, j)] = "."
+                self.liste_cpu_jouable.append(i+str(j))
                 self.grille_joueur_bateau[(i, j)] = "."
                 self.grille_joueur_cherche[(i, j)] = "."
 
@@ -133,7 +136,7 @@ class Core():
                 X = tir[0]
                 Y = int(tir[1:])
                 tir_joueur = True
-            except ValueError:
+            except (IndexError, ValueError):
                 self.affiche(self.grille_joueur_cherche,
                              self.grille_cpu_cherche)
                 print(RED + "Erreur de coordonnée !!!")
@@ -142,12 +145,15 @@ class Core():
             X, Y, self.list_bateaux_cpu, self.grille_joueur_cherche))
 
         # Le CPU JOUE
-        tir_cpu = False
-        while not tir_cpu:
-            X = self.largeur_string[random.randint(0, self.largeur-1)]
-            Y = random.randint(1, self.hauteur)
-            if self.grille_cpu_cherche[(X, Y)] == ".":
-                tir_cpu = True
+        if len(self.liste_cible_ia) > 0:
+            tir = random.choice(self.liste_cible_ia)
+            self.liste_cible_ia.remove(tir)
+        else:
+            tir = random.choice(self.liste_cpu_jouable)
+
+        X = tir[0]
+        Y = int(tir[1:])
+        self.liste_cpu_jouable.remove(tir)
 
         reponse_CPU = WHITE + " | Tir CPU en " + \
             CYAN + X + str(Y) + \
@@ -155,10 +161,13 @@ class Core():
             self.salve(X, Y, self.list_bateaux_joueur,
                        self.grille_cpu_cherche)
 
+        # Affiche les resultats
+
         self.affiche(self.grille_joueur_cherche, self.grille_cpu_cherche)
 
         print("")
         print(reponse_joueur, reponse_CPU)
+        print("TirIA >>", self.liste_cible_ia)
 
     def salve(self, X, Y, liste, grille):
 
@@ -168,10 +177,40 @@ class Core():
             if tir in bateau.position:
                 grille[(X, Y)] = bateau.name
                 reponse = RED + bateau.test_tir(tir)
+                if "coulé" in reponse:
+                    self.liste_cible_ia = []
+                else:
+                    self.IA_cpu(X, Y)
         if reponse == "":
             reponse = CYAN + "A l eau..."
             grille[(X, Y)] = "X"
         return reponse
+
+    def IA_cpu(self, X, Y):
+        """Gestion des tirs suivants si on trouve un bateau
+
+        Arguments:
+            X {STR} -- Tir au format "ABCDEF..."
+            Y {INT} -- Tir ordonnée
+        """
+
+        xx = self.largeur_string.index(X)
+
+        if xx - 1 >= 1 and \
+                self.largeur_string[xx - 1] + str(Y) in self.liste_cpu_jouable:
+            self.liste_cible_ia.append(self.largeur_string[xx - 1] + str(Y))
+
+        if xx + 1 <= self.largeur and \
+                self.largeur_string[xx + 1] + str(Y) in self.liste_cpu_jouable:
+            self.liste_cible_ia.append(self.largeur_string[xx + 1] + str(Y))
+
+        if Y - 1 >= 1 and \
+                X + str(Y-1) in self.liste_cpu_jouable:
+            self.liste_cible_ia.append(X + str(Y - 1))
+
+        if Y + 1 <= self.hauteur and \
+                X + str(Y+1) in self.liste_cpu_jouable:
+            self.liste_cible_ia.append(X + str(Y + 1))
 
 
 if __name__ == "__main__":
