@@ -26,7 +26,7 @@ class Core():
         self.grille_joueur_bateau = dict()
         self.grille_joueur_cherche = dict()
         self.liste_cpu_jouable = []
-        self.liste_cible_ia = []
+        self.cible_ia = dict()
         self.list_bateaux_cpu = []
         self.list_bateaux_joueur = []
         self.largeur = largeur
@@ -37,6 +37,9 @@ class Core():
         # place les bateaux du CPU et du joueur
         self.crea_grille(self.grille_cpu_bateau, self.list_bateaux_cpu)
         self.crea_grille(self.grille_joueur_bateau, self.list_bateaux_joueur)
+        # determine les cibles prioritaires potentielles pour l IA
+        for bateau in self.list_bateaux_joueur:
+            self.cible_ia[bateau]=[] # pas de cible prioritaire
 
     def init_grilles(self):
         for j in range(1, self.hauteur+1):
@@ -145,10 +148,14 @@ class Core():
             X, Y, self.list_bateaux_cpu, self.grille_joueur_cherche))
 
         # Le CPU JOUE
-        if len(self.liste_cible_ia) > 0:
-            tir = random.choice(self.liste_cible_ia)
-            self.liste_cible_ia.remove(tir)
-        else:
+        tir = ""
+        for bateau in self.list_bateaux_joueur:
+            print ("TirIA >>",bateau.long_name, ">>", self.cible_ia[bateau])
+            if len(self.cible_ia[bateau]) > 0:
+                tir = random.choice(self.cible_ia[bateau])
+                self.cible_ia[bateau].remove(tir)
+                break
+        if tir == "":
             tir = random.choice(self.liste_cpu_jouable)
 
         X = tir[0]
@@ -167,7 +174,8 @@ class Core():
 
         print("")
         print(reponse_joueur, reponse_CPU)
-        print("TirIA >>", self.liste_cible_ia)
+        for bateau in self.list_bateaux_joueur:
+            print ("TirIA >>",bateau.long_name, ">>", self.cible_ia[bateau])
 
     def salve(self, X, Y, liste, grille):
 
@@ -178,15 +186,15 @@ class Core():
                 grille[(X, Y)] = bateau.name
                 reponse = RED + bateau.test_tir(tir)
                 if "coulé" in reponse:
-                    self.liste_cible_ia = []
+                    self.cible_ia = dict()
                 else:
-                    self.IA_cpu(X, Y)
+                    self.IA_cpu(X, Y,bateau)
         if reponse == "":
             reponse = CYAN + "A l eau..."
             grille[(X, Y)] = "X"
         return reponse
 
-    def IA_cpu(self, X, Y):
+    def IA_cpu(self, X, Y,bateau):
         """Gestion des tirs suivants si on trouve un bateau
 
         Arguments:
@@ -195,22 +203,29 @@ class Core():
         """
 
         xx = self.largeur_string.index(X)
+        liste_cible_possible = self.cible_ia[bateau]
 
         if xx - 1 >= 1 and \
-                self.largeur_string[xx - 1] + str(Y) in self.liste_cpu_jouable:
-            self.liste_cible_ia.append(self.largeur_string[xx - 1] + str(Y))
+                self.largeur_string[xx - 1] + str(Y) in self.liste_cpu_jouable and \
+                self.largeur_string[xx - 1] + str(Y) not in  liste_cible_possible :
+            liste_cible_possible.append(self.largeur_string[xx - 1] + str(Y))
 
         if xx + 1 <= self.largeur and \
-                self.largeur_string[xx + 1] + str(Y) in self.liste_cpu_jouable:
-            self.liste_cible_ia.append(self.largeur_string[xx + 1] + str(Y))
+                self.largeur_string[xx + 1] + str(Y) in self.liste_cpu_jouable and \
+                self.largeur_string[xx + 1] + str(Y) not in  liste_cible_possible :
+            liste_cible_possible.append(self.largeur_string[xx + 1] + str(Y))
 
         if Y - 1 >= 1 and \
-                X + str(Y-1) in self.liste_cpu_jouable:
-            self.liste_cible_ia.append(X + str(Y - 1))
+                X + str(Y-1) in self.liste_cpu_jouable and \
+                X + str(Y-1) not in  liste_cible_possible :
+            liste_cible_possible.append(X + str(Y - 1))
 
         if Y + 1 <= self.hauteur and \
-                X + str(Y+1) in self.liste_cpu_jouable:
-            self.liste_cible_ia.append(X + str(Y + 1))
+                (X + str(Y+1)) in self.liste_cpu_jouable and \
+                (X + str(Y+1)) not in  liste_cible_possible :
+            liste_cible_possible.append(X + str(Y + 1))
+
+        self.cible_ia[bateau]=liste_cible_possible
 
 
 if __name__ == "__main__":
