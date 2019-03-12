@@ -37,7 +37,6 @@ class Core():
         self.crea_grille(self.grille_cpu_bateau, self.list_bateaux_cpu)
         self.crea_grille(self.grille_joueur_bateau, self.list_bateaux_joueur)
 
-
     def init_grilles(self):
         for j in range(1, self.hauteur+1):
             for i in self.largeur_string:
@@ -148,7 +147,7 @@ class Core():
         while tir not in self.liste_cpu_jouable:
             tir = ""
             for bateau in self.list_bateaux_joueur:
-                print ("TirIA >>",bateau.long_name, ">>", bateau.ia_cible)
+                print("TirIA >>", bateau.long_name, ">>", bateau.ia_cible)
                 if len(bateau.ia_cible) > 0:
                     tir = random.choice(bateau.ia_cible)
                     bateau.ia_cible.remove(tir)
@@ -173,7 +172,7 @@ class Core():
         print("")
         print(reponse_joueur, reponse_CPU)
         for bateau in self.list_bateaux_joueur:
-            print ("TirIA >>",bateau.long_name, "(" + bateau.ia_diposition + ")>>", bateau.ia_cible)
+            print("TirIA >>", bateau.long_name, "(" + bateau.ia_diposition + ")>>", bateau.ia_cible)
 
     def salve(self, X, Y, liste, grille):
 
@@ -181,17 +180,17 @@ class Core():
         tir = X + str(Y)
         for bateau in liste:
             if tir in bateau.position:
-                grille [(X, Y)] = bateau.name
+                grille[(X, Y)] = bateau.name
                 reponse = RED + bateau.test_tir(tir)
-                if "touché" in reponse and bateau.ia_diposition == "": 
+                if "touché" in reponse and bateau.ia_diposition == "":
                     # determine le sens du bateau si possible
-                    if grille[(X,Y+1)] == bateau.name or grille[(X,Y-1)] == bateau.name :
+                    if grille[(X, Y+1)] == bateau.name or grille[(X, Y-1)] == bateau.name:
                         bateau.ia_diposition = "vertical"
-                    if grille[(self.largeur_string[self.largeur_string.index(X)-1],Y)] == bateau.name or \
-                        grille[(self.largeur_string[self.largeur_string.index(X)+1],Y)] == bateau.name :
+                    if grille[(self.largeur_string[self.largeur_string.index(X)-1], Y)] == bateau.name or \
+                       grille[(self.largeur_string[self.largeur_string.index(X)+1], Y)] == bateau.name:
                         bateau.ia_diposition = "horizontal"
 
-                if "coulé" in reponse: 
+                if "coulé" in reponse:
                     bateau.ia_cible = []
                 else:
                     self.IA_cpu(X, Y, bateau)
