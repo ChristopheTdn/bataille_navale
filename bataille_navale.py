@@ -26,7 +26,6 @@ class Core():
         self.grille_joueur_bateau = dict()
         self.grille_joueur_cherche = dict()
         self.liste_cpu_jouable = []
-        self.liste_cible_ia = []
         self.list_bateaux_cpu = []
         self.list_bateaux_joueur = []
         self.largeur = largeur
@@ -120,7 +119,7 @@ class Core():
             print(bateau.long_name, " (", len(bateau.integrite),
                   "/", bateau.taille, " cases)", sep="")
 
-    def round(self):
+    def tour_de_jeu(self):
         '''
          Chaque tour un tir du joueur et un tir du CPU
         '''
@@ -145,11 +144,16 @@ class Core():
             X, Y, self.list_bateaux_cpu, self.grille_joueur_cherche))
 
         # Le CPU JOUE
-        if len(self.liste_cible_ia) > 0:
-            tir = random.choice(self.liste_cible_ia)
-            self.liste_cible_ia.remove(tir)
-        else:
-            tir = random.choice(self.liste_cpu_jouable)
+        while tir not in self.liste_cpu_jouable:
+            tir = ""
+            for bateau in self.list_bateaux_joueur:
+                print("TirIA >>", bateau.long_name, ">>", bateau.ia_cible)
+                if len(bateau.ia_cible) > 0:
+                    tir = random.choice(bateau.ia_cible)
+                    bateau.ia_cible.remove(tir)
+                    break
+            if tir == "":
+                tir = random.choice(self.liste_cpu_jouable)
 
         X = tir[0]
         Y = int(tir[1:])
@@ -167,7 +171,9 @@ class Core():
 
         print("")
         print(reponse_joueur, reponse_CPU)
-        print("TirIA >>", self.liste_cible_ia)
+        for bateau in self.list_bateaux_joueur:
+            print("TirIA >>", bateau.long_name, "(" + bateau.ia_diposition +
+                  ")>>", bateau.ia_cible)
 
     def salve(self, X, Y, liste, grille):
 
@@ -177,16 +183,25 @@ class Core():
             if tir in bateau.position:
                 grille[(X, Y)] = bateau.name
                 reponse = RED + bateau.test_tir(tir)
+                if "touché" in reponse and bateau.ia_diposition == "":
+                    # determine le sens du bateau si possible
+                    if grille[(X, Y+1)] == bateau.name or grille[(X, Y-1)] == bateau.name:
+                        bateau.ia_diposition = "vertical"
+                    if grille[(self.largeur_string[self.largeur_string.index(X) - 1], Y)] == bateau.name or \
+                            grille[(self.largeur_string[self.largeur_string.index(X) + 1], Y)] == bateau.name:
+                        bateau.ia_diposition = "horizontal"
+
                 if "coulé" in reponse:
-                    self.liste_cible_ia = []
+                    bateau.ia_cible = []
                 else:
-                    self.IA_cpu(X, Y)
+                    self.IA_cpu(X, Y, bateau)
+
         if reponse == "":
             reponse = CYAN + "A l eau..."
             grille[(X, Y)] = "X"
         return reponse
 
-    def IA_cpu(self, X, Y):
+    def IA_cpu(self, X, Y, bateau):
         """Gestion des tirs suivants si on trouve un bateau
 
         Arguments:
@@ -195,22 +210,32 @@ class Core():
         """
 
         xx = self.largeur_string.index(X)
+        liste_cible_possible = bateau.ia_cible
+        disposition = bateau.ia_diposition
 
-        if xx - 1 >= 1 and \
-                self.largeur_string[xx - 1] + str(Y) in self.liste_cpu_jouable:
-            self.liste_cible_ia.append(self.largeur_string[xx - 1] + str(Y))
+        if disposition != "vertical":
+            if xx - 1 >= 0 and \
+                    self.largeur_string[xx - 1] + str(Y) in self.liste_cpu_jouable and \
+                    self.largeur_string[xx - 1] + str(Y) not in liste_cible_possible:
+                liste_cible_possible.append(self.largeur_string[xx - 1] + str(Y))
 
-        if xx + 1 <= self.largeur and \
-                self.largeur_string[xx + 1] + str(Y) in self.liste_cpu_jouable:
-            self.liste_cible_ia.append(self.largeur_string[xx + 1] + str(Y))
+            if xx + 1 < self.largeur and \
+                    self.largeur_string[xx + 1] + str(Y) in self.liste_cpu_jouable and \
+                    self.largeur_string[xx + 1] + str(Y) not in liste_cible_possible:
+                liste_cible_possible.append(self.largeur_string[xx + 1] + str(Y))
 
-        if Y - 1 >= 1 and \
-                X + str(Y-1) in self.liste_cpu_jouable:
-            self.liste_cible_ia.append(X + str(Y - 1))
+        if disposition != "horizontal":
+            if Y - 1 >= 1 and \
+                    X + str(Y-1) in self.liste_cpu_jouable and \
+                    X + str(Y-1) not in liste_cible_possible:
+                liste_cible_possible.append(X + str(Y - 1))
 
-        if Y + 1 <= self.hauteur and \
-                X + str(Y+1) in self.liste_cpu_jouable:
-            self.liste_cible_ia.append(X + str(Y + 1))
+            if Y + 1 <= self.hauteur and \
+                    (X + str(Y+1)) in self.liste_cpu_jouable and \
+                    (X + str(Y+1)) not in liste_cible_possible:
+                liste_cible_possible.append(X + str(Y + 1))
+
+        bateau.ia_cible = liste_cible_possible
 
 
 if __name__ == "__main__":
@@ -229,4 +254,4 @@ if __name__ == "__main__":
     game = Core(12, 12)
     game.affiche(game.grille_joueur_cherche, game.grille_joueur_bateau)
     while "jeu_en_cours":
-        game.round()
+        game.tour_de_jeu()
