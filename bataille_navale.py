@@ -148,15 +148,16 @@ class Core():
             X, Y, self.list_bateaux_cpu, self.grille_joueur_cherche))
 
         # Le CPU JOUE
-        tir = ""
-        for bateau in self.list_bateaux_joueur:
-            print ("TirIA >>",bateau.long_name, ">>", self.cible_ia[bateau])
-            if len(self.cible_ia[bateau]) > 0:
-                tir = random.choice(self.cible_ia[bateau])
-                self.cible_ia[bateau].remove(tir)
-                break
-        if tir == "":
-            tir = random.choice(self.liste_cpu_jouable)
+        while tir not in self.liste_cpu_jouable:
+            tir = ""
+            for bateau in self.list_bateaux_joueur:
+                print ("TirIA >>",bateau.long_name, ">>", self.cible_ia[bateau])
+                if len(self.cible_ia[bateau]) > 0:
+                    tir = random.choice(self.cible_ia[bateau])
+                    self.cible_ia[bateau].remove(tir)
+                    break
+            if tir == "":
+                tir = random.choice(self.liste_cpu_jouable)
 
         X = tir[0]
         Y = int(tir[1:])
@@ -186,7 +187,7 @@ class Core():
                 grille[(X, Y)] = bateau.name
                 reponse = RED + bateau.test_tir(tir)
                 if "coulé" in reponse:
-                    self.cible_ia = dict()
+                    self.cible_ia[bateau] = []
                 else:
                     self.IA_cpu(X, Y,bateau)
         if reponse == "":
@@ -205,12 +206,12 @@ class Core():
         xx = self.largeur_string.index(X)
         liste_cible_possible = self.cible_ia[bateau]
 
-        if xx - 1 >= 1 and \
+        if xx - 1 >= 0 and \
                 self.largeur_string[xx - 1] + str(Y) in self.liste_cpu_jouable and \
                 self.largeur_string[xx - 1] + str(Y) not in  liste_cible_possible :
             liste_cible_possible.append(self.largeur_string[xx - 1] + str(Y))
 
-        if xx + 1 <= self.largeur and \
+        if xx + 1 < self.largeur and \
                 self.largeur_string[xx + 1] + str(Y) in self.liste_cpu_jouable and \
                 self.largeur_string[xx + 1] + str(Y) not in  liste_cible_possible :
             liste_cible_possible.append(self.largeur_string[xx + 1] + str(Y))
