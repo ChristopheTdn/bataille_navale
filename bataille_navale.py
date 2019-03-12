@@ -26,7 +26,6 @@ class Core():
         self.grille_joueur_bateau = dict()
         self.grille_joueur_cherche = dict()
         self.liste_cpu_jouable = []
-        self.cible_ia = dict()
         self.list_bateaux_cpu = []
         self.list_bateaux_joueur = []
         self.largeur = largeur
@@ -37,9 +36,7 @@ class Core():
         # place les bateaux du CPU et du joueur
         self.crea_grille(self.grille_cpu_bateau, self.list_bateaux_cpu)
         self.crea_grille(self.grille_joueur_bateau, self.list_bateaux_joueur)
-        # determine les cibles prioritaires potentielles pour l IA
-        for bateau in self.list_bateaux_joueur:
-            self.cible_ia[bateau]=[] # pas de cible prioritaire
+
 
     def init_grilles(self):
         for j in range(1, self.hauteur+1):
@@ -123,7 +120,7 @@ class Core():
             print(bateau.long_name, " (", len(bateau.integrite),
                   "/", bateau.taille, " cases)", sep="")
 
-    def round(self):
+    def tour_de_jeu(self):
         '''
          Chaque tour un tir du joueur et un tir du CPU
         '''
@@ -151,10 +148,10 @@ class Core():
         while tir not in self.liste_cpu_jouable:
             tir = ""
             for bateau in self.list_bateaux_joueur:
-                print ("TirIA >>",bateau.long_name, ">>", self.cible_ia[bateau])
-                if len(self.cible_ia[bateau]) > 0:
-                    tir = random.choice(self.cible_ia[bateau])
-                    self.cible_ia[bateau].remove(tir)
+                print ("TirIA >>",bateau.long_name, ">>", bateau.ia_cible)
+                if len(bateau.ia_cible) > 0:
+                    tir = random.choice(bateau.ia_cible)
+                    bateau.ia_cible.remove(tir)
                     break
             if tir == "":
                 tir = random.choice(self.liste_cpu_jouable)
@@ -176,7 +173,7 @@ class Core():
         print("")
         print(reponse_joueur, reponse_CPU)
         for bateau in self.list_bateaux_joueur:
-            print ("TirIA >>",bateau.long_name, ">>", self.cible_ia[bateau])
+            print ("TirIA >>",bateau.long_name, "(" + bateau.ia_diposition + ")>>", bateau.ia_cible)
 
     def salve(self, X, Y, liste, grille):
 
@@ -184,12 +181,21 @@ class Core():
         tir = X + str(Y)
         for bateau in liste:
             if tir in bateau.position:
-                grille[(X, Y)] = bateau.name
+                grille [(X, Y)] = bateau.name
                 reponse = RED + bateau.test_tir(tir)
-                if "coulé" in reponse:
-                    self.cible_ia[bateau] = []
+                if "touché" in reponse and bateau.ia_diposition == "": 
+                    # determine le sens du bateau si possible
+                    if grille[(X,Y+1)] == bateau.name or grille[(X,Y-1)] == bateau.name :
+                        bateau.ia_diposition = "vertical"
+                    if grille[(self.largeur_string[self.largeur_string.index(X)-1],Y)] == bateau.name or \
+                        grille[(self.largeur_string[self.largeur_string.index(X)+1],Y)] == bateau.name :
+                        bateau.ia_diposition = "horizontal"
+
+                if "coulé" in reponse: 
+                    bateau.ia_cible = []
                 else:
-                    self.IA_cpu(X, Y,bateau)
+                    self.IA_cpu(X, Y, bateau)
+
         if reponse == "":
             reponse = CYAN + "A l eau..."
             grille[(X, Y)] = "X"
@@ -204,29 +210,33 @@ class Core():
         """
 
         xx = self.largeur_string.index(X)
-        liste_cible_possible = self.cible_ia[bateau]
+        liste_cible_possible = bateau.ia_cible
+        disposition = bateau.ia_diposition
 
-        if xx - 1 >= 0 and \
-                self.largeur_string[xx - 1] + str(Y) in self.liste_cpu_jouable and \
-                self.largeur_string[xx - 1] + str(Y) not in  liste_cible_possible :
-            liste_cible_possible.append(self.largeur_string[xx - 1] + str(Y))
+        if disposition != "vertical" :
+            if xx - 1 >= 0 and \
+                    self.largeur_string[xx - 1] + str(Y) in self.liste_cpu_jouable and \
+                    self.largeur_string[xx - 1] + str(Y) not in  liste_cible_possible :
+                liste_cible_possible.append(self.largeur_string[xx - 1] + str(Y))
 
-        if xx + 1 < self.largeur and \
-                self.largeur_string[xx + 1] + str(Y) in self.liste_cpu_jouable and \
-                self.largeur_string[xx + 1] + str(Y) not in  liste_cible_possible :
-            liste_cible_possible.append(self.largeur_string[xx + 1] + str(Y))
+            if xx + 1 < self.largeur and \
+                    self.largeur_string[xx + 1] + str(Y) in self.liste_cpu_jouable and \
+                    self.largeur_string[xx + 1] + str(Y) not in  liste_cible_possible :
+                liste_cible_possible.append(self.largeur_string[xx + 1] + str(Y))
 
-        if Y - 1 >= 1 and \
-                X + str(Y-1) in self.liste_cpu_jouable and \
-                X + str(Y-1) not in  liste_cible_possible :
-            liste_cible_possible.append(X + str(Y - 1))
+            
+        if disposition != "horizontal" :
+            if Y - 1 >= 1 and \
+                    X + str(Y-1) in self.liste_cpu_jouable and \
+                    X + str(Y-1) not in  liste_cible_possible :
+                liste_cible_possible.append(X + str(Y - 1))
 
-        if Y + 1 <= self.hauteur and \
-                (X + str(Y+1)) in self.liste_cpu_jouable and \
-                (X + str(Y+1)) not in  liste_cible_possible :
-            liste_cible_possible.append(X + str(Y + 1))
+            if Y + 1 <= self.hauteur and \
+                    (X + str(Y+1)) in self.liste_cpu_jouable and \
+                    (X + str(Y+1)) not in  liste_cible_possible :
+                liste_cible_possible.append(X + str(Y + 1))
 
-        self.cible_ia[bateau]=liste_cible_possible
+        bateau.ia_cible = liste_cible_possible
 
 
 if __name__ == "__main__":
@@ -245,4 +255,4 @@ if __name__ == "__main__":
     game = Core(12, 12)
     game.affiche(game.grille_joueur_cherche, game.grille_joueur_bateau)
     while "jeu_en_cours":
-        game.round()
+        game.tour_de_jeu()

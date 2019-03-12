@@ -20,6 +20,8 @@ class Bateau():
         self.taille = taille
         self.position = []
         self.integrite = []
+        self.ia_cible =[]
+        self.ia_diposition = ""
 
     def place_bateau(self, grille, largeur, hauteur):
         import random
