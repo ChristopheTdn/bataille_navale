@@ -183,12 +183,17 @@ class Core():
                 grille[(X, Y)] = bateau.name
                 reponse = RED + bateau.test_tir(tir)
                 if "touché" in reponse and bateau.ia_diposition == "":
+                    xx = self.largeur_string.index(X)
+
                     # determine le sens du bateau si possible
                     if grille[(X, Y+1)] == bateau.name or grille[(X, Y-1)] == bateau.name:
                         bateau.ia_diposition = "vertical"
-                    if grille[(self.largeur_string[self.largeur_string.index(X)-1], Y)] == bateau.name or \
-                       grille[(self.largeur_string[self.largeur_string.index(X)+1], Y)] == bateau.name:
-                        bateau.ia_diposition = "horizontal"
+                    if xx >= 1:
+                        if grille[(self.largeur_string[xx-1], Y)] == bateau.name :
+                            bateau.ia_diposition = "horizontal"
+                    if xx < self.largeur-1:
+                        if grille[(self.largeur_string[xx+1], Y)] == bateau.name:
+                            bateau.ia_diposition = "horizontal"
 
                 if "coulé" in reponse:
                     bateau.ia_cible = []
