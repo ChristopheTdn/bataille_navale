@@ -144,6 +144,8 @@ class Core():
             X, Y, self.list_bateaux_cpu, self.grille_joueur_cherche))
 
         # Le CPU JOUE
+        tir = ""
+
         while tir not in self.liste_cpu_jouable:
             tir = ""
             for bateau in self.list_bateaux_joueur:
@@ -186,10 +188,15 @@ class Core():
                     xx = self.largeur_string.index(X)
 
                     # determine le sens du bateau si possible
-                    if grille[(X, Y+1)] == bateau.name or grille[(X, Y-1)] == bateau.name:
-                        bateau.ia_diposition = "vertical"
+                    if Y > 1:
+                        if grille[(X, Y - 1)] == bateau.name:
+                            bateau.ia_diposition = "vertical"
+                    if Y < self.hauteur:
+                        if grille[(X, Y + 1)] == bateau.name:
+                            bateau.ia_diposition = "vertical"
+
                     if xx >= 1:
-                        if grille[(self.largeur_string[xx-1], Y)] == bateau.name :
+                        if grille[(self.largeur_string[xx-1], Y)] == bateau.name:
                             bateau.ia_diposition = "horizontal"
                     if xx < self.largeur-1:
                         if grille[(self.largeur_string[xx+1], Y)] == bateau.name:
@@ -197,6 +204,7 @@ class Core():
 
                 if "coulé" in reponse:
                     bateau.ia_cible = []
+                    test_victoire(self)
                 else:
                     self.IA_cpu(X, Y, bateau)
 
@@ -255,7 +263,7 @@ if __name__ == "__main__":
     WHITE = Fore.WHITE
     RESET = Fore.RESET
 
-    game = Core(12, 12)
+    game = Core(10, 10)
     game.affiche(game.grille_joueur_cherche, game.grille_joueur_bateau)
     while "jeu_en_cours":
         game.tour_de_jeu()
