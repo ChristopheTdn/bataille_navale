@@ -175,6 +175,8 @@ class Core():
         print(reponse_joueur, reponse_CPU)
         for bateau in self.list_bateaux_joueur:
             print("TirIA >>", bateau.long_name, "(" + bateau.ia_diposition + ")>>", bateau.ia_cible)
+        
+        self.test_victoire()
 
     def salve(self, X, Y, liste, grille):
 
@@ -204,7 +206,6 @@ class Core():
 
                 if "coulé" in reponse:
                     bateau.ia_cible = []
-                    test_victoire(self)
                 else:
                     self.IA_cpu(X, Y, bateau)
 
@@ -248,6 +249,14 @@ class Core():
                 liste_cible_possible.append(X + str(Y + 1))
 
         bateau.ia_cible = liste_cible_possible
+
+    def test_victoire(self):
+        """
+        Test la victoire de l'un des deux camps
+        """
+        for bateau in self.list_bateaux_cpu:
+            if 
+        
 
 
 if __name__ == "__main__":
