@@ -21,7 +21,14 @@ class Core():
 
     """
 
-    def __init__(self, largeur=10, hauteur=10):
+    def __init__(self, largeur=10, hauteur=10, DEBUG=False):
+        """initialise la classe Core de la bataille_navale
+
+        Keyword Arguments:
+            largeur {int} -- largeur de la grille en nombre (default: {10})
+            hauteur {int} -- hauteur de la grille en nombre (default: {10})
+        """
+        self.DEBUG = DEBUG
         self.grille_cpu_bateau = dict()
         self.grille_cpu_cherche = dict()
         self.grille_joueur_bateau = dict()
@@ -39,6 +46,9 @@ class Core():
         self.crea_grille(self.grille_joueur_bateau, self.lst_bateaux_joueur)
 
     def init_grilles(self):
+        """Création des grilles et des listes de jeu
+        """
+
         for j in range(1, self.hauteur+1):
             for i in self.largeur_str:
                 self.grille_cpu_bateau[(i, j)] = "."
@@ -65,21 +75,25 @@ class Core():
             bateau.place_bateau(grille, self.largeur, self.hauteur)
 
     def affiche(self, grille, grille2=None):
-        """Affiche les grilles passées en parametre
+        """Affiche les grilles passées en parametre cote a côte
 
         Arguments:
             grille {dict} -- Un dictionnaire au format (A,1) = "." pour la mer
+            grille2 {dict} -- idem grille2 - Default = None
         """
+
         print('\x1b[2J')  # cls
         # GRILLE 1
         print(GREEN + "   | ", end="")
         for i in self.largeur_str:
             print(GREEN + " " + i + " ", end="")
+
         # GRILLE 2
-        print('   ', end="")
-        print(GREEN + "   | ", end="")
-        for i in self.largeur_str:
-            print(GREEN + " " + i + " ", end="")
+        if grille2:
+            print('   ', end="")
+            print(GREEN + "   | ", end="")
+            for i in self.largeur_str:
+                print(GREEN + " " + i + " ", end="")
 
         print("")
         # GRILLE 1
@@ -88,13 +102,14 @@ class Core():
             print(GREEN + "---", end="")
         print("   ", end="")
         # GRILLE 2
-        if grille2 is not None:
+        if grille2:
             print(GREEN + "---|-", end="")
             for i in self.largeur_str:
                 print(GREEN + "---", end="")
 
         for j in range(self.hauteur):
             print("")
+            # GRILLE 1
             print(GREEN + "{0:2d}".format(j + 1)+" | ", end="")
             for i in self.largeur_str:
                 couleur = RED
@@ -103,8 +118,8 @@ class Core():
                 if grille[(i, j + 1)] == ".":
                     couleur = CYAN
                 print(couleur, grille[(i, j + 1)] + " ", end='')
-            # GRILLE2
-            if grille2 is not None:
+            # GRILLE 2
+            if grille2:
                 print("   ", end="")
                 print(GREEN + "{0:2d}".format(j + 1)+" | ", end="")
                 for i in self.largeur_str:
@@ -139,10 +154,16 @@ class Core():
             except (IndexError, ValueError):
                 self.affiche(self.grille_joueur_cherche,
                              self.grille_cpu_cherche)
-                print(RED + "Erreur de coordonnée !!!")
+                print(RED + "ERREUR !!! : " +
+                      WHITE + "Erreur de coordonnée !!!")
 
-        reponse_joueur = (self.salve(
-            X, Y, self.lst_bateaux_cpu, self.grille_joueur_cherche))
+        reponse_joueur = WHITE + "Tir JOUEUR en " + \
+            CYAN + X + str(Y) + \
+            WHITE + " >>  " + CYAN + \
+            (self.salve(X,
+                        Y,
+                        self.lst_bateaux_cpu,
+                        self.grille_joueur_cherche))
 
         # Le CPU JOUE
         tir = ""
@@ -164,7 +185,7 @@ class Core():
 
         reponse_CPU = WHITE + " | Tir CPU en " + \
             CYAN + X + str(Y) + \
-            WHITE + ">>  " + CYAN + \
+            WHITE + " >>  " + CYAN + \
             self.salve(X, Y, self.lst_bateaux_joueur,
                        self.grille_cpu_cherche)
 
@@ -173,10 +194,12 @@ class Core():
         self.affiche(self.grille_joueur_cherche, self.grille_cpu_cherche)
 
         print("")
-        print(reponse_joueur, reponse_CPU)
-        for bateau in self.lst_bateaux_joueur:
-            print("TirIA >>", bateau.long_name,
-                  "(" + bateau.ia_diposition + ")>>", bateau.ia_cible)
+        print(reponse_joueur, reponse_CPU, "\n")
+
+        if self.DEBUG:
+            for bateau in self.lst_bateaux_joueur:
+                print(GREEN + "TirIA >>", bateau.long_name,
+                      "(" + bateau.ia_diposition + ")>>", bateau.ia_cible)
 
         self.fin_de_jeu()
 
@@ -207,7 +230,7 @@ class Core():
         for bateau in liste:
             if tir in bateau.position:
                 grille[(X, Y)] = bateau.name
-                reponse = RED + bateau.test_tir(tir)
+                reponse = RED + bateau.test_tir(tir) + WHITE
                 if "touché" in reponse and bateau.ia_diposition == "":
                     xx = self.largeur_str.index(X)
 
@@ -296,7 +319,7 @@ if __name__ == "__main__":
     WHITE = Fore.WHITE
     RESET = Fore.RESET
 
-    game = Core(10, 10)
-    game.affiche(game.grille_joueur_cherche, game.grille_joueur_bateau)
+    game = Core(10, 10, DEBUG = True)
+    game.affiche(game.grille_joueur_bateau)
     while "jeu_en_cours":
         game.tour_de_jeu()
