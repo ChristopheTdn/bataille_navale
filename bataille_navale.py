@@ -28,7 +28,7 @@ class Core():
             largeur {int} -- largeur de la grille en nombre (default: {10})
             hauteur {int} -- hauteur de la grille en nombre (default: {10})
         """
-        self.tour=0
+        self.tour = 0
         self.DEBUG = DEBUG
         self.grille_cpu_bateau = dict()
         self.grille_cpu_cherche = dict()
@@ -216,7 +216,7 @@ class Core():
             print("\n",
                   RED + " VICTOIRE !!! " +
                   WHITE + "Vous avez coulé toute la flotte ennemie ! (score=" +
-                  RED + "{}".format(self.tour)+
+                  RED + "{}".format(self.tour) +
                   WHITE + " tours)",
                   "\n")
             sys.exit(0)
@@ -224,7 +224,7 @@ class Core():
             print("\n",
                   RED + " DEFAITE !!! " +
                   WHITE + "L ordinateur a coulé tous vos bateaux ! (score=" +
-                  RED + "{}".format(self.tour)+
+                  RED + "{}".format(self.tour) +
                   WHITE + " tours)",
                   "\n")
             sys.exit(0)
@@ -326,7 +326,7 @@ if __name__ == "__main__":
     WHITE = Fore.WHITE
     RESET = Fore.RESET
 
-    game = Core(10, 10, DEBUG = True)
+    game = Core(10, 10)
     game.affiche(game.grille_joueur_bateau)
     while "jeu_en_cours":
         game.tour_de_jeu()
