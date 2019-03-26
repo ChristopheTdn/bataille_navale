@@ -28,7 +28,7 @@ class Core():
             largeur {int} -- largeur de la grille en nombre (default: {10})
             hauteur {int} -- hauteur de la grille en nombre (default: {10})
         """
-        self.tour=0
+        self.tour = 0
         self.DEBUG = DEBUG
         self.grille_cpu_bateau = dict()
         self.grille_cpu_cherche = dict()
@@ -45,6 +45,7 @@ class Core():
         # place les bateaux du CPU et du joueur
         self.crea_grille(self.grille_cpu_bateau, self.lst_bateaux_cpu)
         self.crea_grille(self.grille_joueur_bateau, self.lst_bateaux_joueur)
+        self.aff_titre()
 
     def init_grilles(self):
         """Création des grilles et des listes de jeu
@@ -84,6 +85,7 @@ class Core():
         """
 
         print('\x1b[2J')  # cls
+        self.aff_titre()
         # GRILLE 1
         print(GREEN + "   | ", end="")
         for i in self.largeur_str:
@@ -216,7 +218,7 @@ class Core():
             print("\n",
                   RED + " VICTOIRE !!! " +
                   WHITE + "Vous avez coulé toute la flotte ennemie ! (score=" +
-                  RED + "{}".format(self.tour)+
+                  RED + "{}".format(self.tour) +
                   WHITE + " tours)",
                   "\n")
             sys.exit(0)
@@ -224,7 +226,7 @@ class Core():
             print("\n",
                   RED + " DEFAITE !!! " +
                   WHITE + "L ordinateur a coulé tous vos bateaux ! (score=" +
-                  RED + "{}".format(self.tour)+
+                  RED + "{}".format(self.tour) +
                   WHITE + " tours)",
                   "\n")
             sys.exit(0)
@@ -312,6 +314,18 @@ class Core():
                 return False  # Au moins un bateau vivant
         return True
 
+    def aff_titre(self):
+        titre = ""
+        titre += "  ____        _   _   _       _____ _     _"+"\n"
+        titre += " |  _ \      | | | | | |     / ____| |   (_)"+"\n"
+        titre += " | |_) | __ _| |_| |_| | ___| (___ | |__  _ _ __"+"\n"
+        titre += " |  _ < / _` | __| __| |/ _ \\\___ \| '_ \| | '_ \ "+"\n"
+        titre += " | |_) | (_| | |_| |_| |  __/____) | | | | | |_) |"+"\n"
+        titre += " |____/ \__,_|\__|\__|_|\___|_____/|_| |_|_| .__/"+"\n"
+        titre += "                                           | |"+"\n"
+        titre += "                                           |_|"+"\n"
+        print(titre)
+
 
 if __name__ == "__main__":
 
@@ -326,7 +340,7 @@ if __name__ == "__main__":
     WHITE = Fore.WHITE
     RESET = Fore.RESET
 
-    game = Core(10, 10, DEBUG = True)
+    game = Core(10, 10, DEBUG=True)
     game.affiche(game.grille_joueur_bateau)
     while "jeu_en_cours":
         game.tour_de_jeu()
