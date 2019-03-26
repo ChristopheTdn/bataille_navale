@@ -340,7 +340,7 @@ if __name__ == "__main__":
     WHITE = Fore.WHITE
     RESET = Fore.RESET
 
-    game = Core(10, 10, DEBUG=True)
+    game = Core(10, 10)
     game.affiche(game.grille_joueur_bateau)
     while "jeu_en_cours":
         game.tour_de_jeu()
