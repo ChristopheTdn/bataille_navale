@@ -10,12 +10,23 @@ years : 2019
 import sys
 import random
 from colorama import init, Fore
+
 init()
+
+# Constantes
+
+RED = Fore.RED
+BLUE = Fore.BLUE
+GREEN = Fore.GREEN
+YELLOW = Fore.YELLOW
+CYAN = Fore.CYAN
+WHITE = Fore.WHITE
+RESET = Fore.RESET
 
 # class
 
 
-class Core():
+class Core:
     """
      Création du coeur de jeu Bataille navale
 
@@ -28,6 +39,7 @@ class Core():
             largeur {int} -- largeur de la grille en nombre (default: {10})
             hauteur {int} -- hauteur de la grille en nombre (default: {10})
         """
+        self.version = "0.9b"
         self.tour = 0
         self.DEBUG = DEBUG
         self.grille_cpu_bateau = dict()
@@ -38,7 +50,7 @@ class Core():
         self.lst_bateaux_cpu = []
         self.lst_bateaux_joueur = []
         self.largeur = largeur
-        self.largeur_str = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"[0:self.largeur]
+        self.largeur_str = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"[0: self.largeur]
         self.hauteur = hauteur
         # rempli les mers de vide (".")
         self.init_grilles()
@@ -51,11 +63,11 @@ class Core():
         """Création des grilles et des listes de jeu
         """
 
-        for j in range(1, self.hauteur+1):
+        for j in range(1, self.hauteur + 1):
             for i in self.largeur_str:
                 self.grille_cpu_bateau[(i, j)] = "."
                 self.grille_cpu_cherche[(i, j)] = "."
-                self.lst_cpu_jouable.append(i+str(j))
+                self.lst_cpu_jouable.append(i + str(j))
                 self.grille_joueur_bateau[(i, j)] = "."
                 self.grille_joueur_cherche[(i, j)] = "."
 
@@ -68,11 +80,15 @@ class Core():
             liste {[list]} -- La liste des objets 'Bateau' placé sur la grille.
         """
 
-        liste.extend([Bateau("P", "Porte-Avions", 6),
-                      Bateau("D", "Destroyer", 5),
-                      Bateau("C", "Corvette", 4),
-                      Bateau("S", "Sous-Marin", 3),
-                      Bateau("E", "Escorteur", 2)])
+        liste.extend(
+            [
+                Bateau("P", "Porte-Avions", 6),
+                Bateau("D", "Destroyer", 5),
+                Bateau("C", "Corvette", 4),
+                Bateau("S", "Sous-Marin", 3),
+                Bateau("E", "Escorteur", 2),
+            ]
+        )
         for bateau in liste:
             bateau.place_bateau(grille, self.largeur, self.hauteur)
 
@@ -84,7 +100,7 @@ class Core():
             grille2 {dict} -- idem grille2 - Default = None
         """
 
-        print('\x1b[2J')  # cls
+        print("\x1b[2J")  # cls
         self.aff_titre()
         # GRILLE 1
         print(GREEN + "   | ", end="")
@@ -93,7 +109,7 @@ class Core():
 
         # GRILLE 2
         if grille2:
-            print('   ', end="")
+            print("   ", end="")
             print(GREEN + "   | ", end="")
             for i in self.largeur_str:
                 print(GREEN + " " + i + " ", end="")
@@ -113,35 +129,42 @@ class Core():
         for j in range(self.hauteur):
             print("")
             # GRILLE 1
-            print(GREEN + "{0:2d}".format(j + 1)+" | ", end="")
+            print(GREEN + "{0:2d}".format(j + 1) + " | ", end="")
             for i in self.largeur_str:
                 couleur = RED
                 if grille[(i, j + 1)] == "X":
                     couleur = BLUE
                 if grille[(i, j + 1)] == ".":
                     couleur = CYAN
-                print(couleur, grille[(i, j + 1)] + " ", end='')
+                print(couleur, grille[(i, j + 1)] + " ", end="")
             # GRILLE 2
             if grille2:
                 print("   ", end="")
-                print(GREEN + "{0:2d}".format(j + 1)+" | ", end="")
+                print(GREEN + "{0:2d}".format(j + 1) + " | ", end="")
                 for i in self.largeur_str:
                     couleur = RED
                     if grille2[(i, j + 1)] == "X":
                         couleur = BLUE
                     if grille2[(i, j + 1)] == ".":
                         couleur = CYAN
-                    print(couleur, grille2[(i, j + 1)] + " ", end='')
+                    print(couleur, grille2[(i, j + 1)] + " ", end="")
 
         print("\n")
         for bateau in self.lst_bateaux_cpu:
-            print(bateau.long_name, " (", len(bateau.integrite),
-                  "/", bateau.taille, " cases)", sep="")
+            print(
+                bateau.long_name,
+                " (",
+                len(bateau.integrite),
+                "/",
+                bateau.taille,
+                " cases)",
+                sep="",
+            )
 
     def tour_de_jeu(self):
-        '''
+        """
          Chaque tour un tir du joueur et un tir du CPU
-        '''
+        """
         self.tour += 1
 
         # Le JOUEUR COMMENCE
@@ -150,7 +173,7 @@ class Core():
         while not tir_joueur:
             print(WHITE + "\nEntrer votre salve: ", end="")
             tir = input()
-        # parse tir
+            # parse tir
             try:
                 tir = tir.upper()
                 X = tir[0]
@@ -162,13 +185,18 @@ class Core():
                 print(RED + "ERREUR !!! : " +
                       WHITE + "Erreur de coordonnée !!!")
 
-        reponse_joueur = WHITE + "Tir JOUEUR en " + \
-            CYAN + X + str(Y) + \
-            WHITE + " >>  " + CYAN + \
-            (self.salve(X,
-                        Y,
-                        self.lst_bateaux_cpu,
-                        self.grille_joueur_cherche))
+        reponse_joueur = (
+            WHITE
+            + "Tir JOUEUR en "
+            + CYAN
+            + X
+            + str(Y)
+            + WHITE
+            + " >>  "
+            + CYAN
+            + (self.salve(X, Y, self.lst_bateaux_cpu,
+                          self.grille_joueur_cherche))
+        )
 
         # Le CPU JOUE
         tir = ""
@@ -188,11 +216,18 @@ class Core():
         Y = int(tir[1:])
         self.lst_cpu_jouable.remove(tir)
 
-        reponse_CPU = WHITE + " | Tir CPU en " + \
-            CYAN + X + str(Y) + \
-            WHITE + " >>  " + CYAN + \
-            self.salve(X, Y, self.lst_bateaux_joueur,
-                       self.grille_cpu_cherche)
+        reponse_CPU = (
+            WHITE
+            + " | Tir CPU en "
+            + CYAN
+            + X
+            + str(Y)
+            + WHITE
+            + " >>  "
+            + CYAN
+            + self.salve(X, Y, self.lst_bateaux_joueur,
+                         self.grille_cpu_cherche)
+        )
 
         # Affiche les resultats
 
@@ -203,8 +238,12 @@ class Core():
 
         if self.DEBUG:
             for bateau in self.lst_bateaux_joueur:
-                print(GREEN + "TirIA >>", bateau.long_name,
-                      "(" + bateau.ia_diposition + ")>>", bateau.ia_cible)
+                print(
+                    GREEN + "TirIA >>",
+                    bateau.long_name,
+                    "(" + bateau.ia_diposition + ")>>",
+                    bateau.ia_cible,
+                )
 
         self.fin_de_jeu()
 
@@ -215,20 +254,32 @@ class Core():
         """
 
         if self.test_victoire(self.lst_bateaux_cpu):
-            print("\n",
-                  RED + " VICTOIRE !!! " +
-                  WHITE + "Vous avez coulé toute la flotte ennemie ! (score=" +
-                  RED + "{}".format(self.tour) +
-                  WHITE + " tours)",
-                  "\n")
+            print(
+                "\n",
+                RED
+                + " VICTOIRE !!! "
+                + WHITE
+                + "Vous avez coulé toute la flotte ennemie ! (score="
+                + RED
+                + "{}".format(self.tour)
+                + WHITE
+                + " tours)",
+                "\n",
+            )
             sys.exit(0)
         if self.test_victoire(self.lst_bateaux_joueur):
-            print("\n",
-                  RED + " DEFAITE !!! " +
-                  WHITE + "L ordinateur a coulé tous vos bateaux ! (score=" +
-                  RED + "{}".format(self.tour) +
-                  WHITE + " tours)",
-                  "\n")
+            print(
+                "\n",
+                RED
+                + " DEFAITE !!! "
+                + WHITE
+                + "L ordinateur a coulé tous vos bateaux ! (score="
+                + RED
+                + "{}".format(self.tour)
+                + WHITE
+                + " tours)",
+                "\n",
+            )
             sys.exit(0)
         return False
 
@@ -255,8 +306,9 @@ class Core():
                         if grille[(self.largeur_str[xx - 1],
                                    Y)] == bateau.name:
                             bateau.ia_diposition = "horizontal"
-                    if xx < self.largeur-1:
-                        if grille[(self.largeur_str[xx+1], Y)] == bateau.name:
+                    if xx < self.largeur - 1:
+                        if grille[(self.largeur_str[xx + 1],
+                                   Y)] == bateau.name:
                             bateau.ia_diposition = "horizontal"
 
                 if "coulé" in reponse:
@@ -282,25 +334,33 @@ class Core():
         disposition = bateau.ia_diposition
 
         if disposition != "vertical":
-            if xx - 1 >= 0 and \
-               self.largeur_str[xx - 1] + str(Y) in self.lst_cpu_jouable and \
-               self.largeur_str[xx - 1] + str(Y) not in lst_cible_possible:
+            if (
+                xx - 1 >= 0
+                and self.largeur_str[xx - 1] + str(Y) in self.lst_cpu_jouable
+                and self.largeur_str[xx - 1] + str(Y) not in lst_cible_possible
+            ):
                 lst_cible_possible.append(self.largeur_str[xx - 1] + str(Y))
 
-            if xx + 1 < self.largeur and \
-               self.largeur_str[xx + 1] + str(Y) in self.lst_cpu_jouable and \
-               self.largeur_str[xx + 1] + str(Y) not in lst_cible_possible:
+            if (
+                xx + 1 < self.largeur
+                and self.largeur_str[xx + 1] + str(Y) in self.lst_cpu_jouable
+                and self.largeur_str[xx + 1] + str(Y) not in lst_cible_possible
+            ):
                 lst_cible_possible.append(self.largeur_str[xx + 1] + str(Y))
 
         if disposition != "horizontal":
-            if Y - 1 >= 1 and \
-                    X + str(Y-1) in self.lst_cpu_jouable and \
-                    X + str(Y-1) not in lst_cible_possible:
+            if (
+                Y - 1 >= 1
+                and X + str(Y - 1) in self.lst_cpu_jouable
+                and X + str(Y - 1) not in lst_cible_possible
+            ):
                 lst_cible_possible.append(X + str(Y - 1))
 
-            if Y + 1 <= self.hauteur and \
-                    (X + str(Y+1)) in self.lst_cpu_jouable and \
-                    (X + str(Y+1)) not in lst_cible_possible:
+            if (
+                Y + 1 <= self.hauteur
+                and (X + str(Y + 1)) in self.lst_cpu_jouable
+                and (X + str(Y + 1)) not in lst_cible_possible
+            ):
                 lst_cible_possible.append(X + str(Y + 1))
 
         bateau.ia_cible = lst_cible_possible
@@ -316,14 +376,14 @@ class Core():
 
     def aff_titre(self):
         titre = ""
-        titre += "  ____        _   _   _       _____ _     _"+"\n"
-        titre += " |  _ \\      | | | | | |     / ____| |   (_)"+"\n"
-        titre += " | |_) | __ _| |_| |_| | ___| (___ | |__  _ _ __"+"\n"
-        titre += " |  _ < / _` | __| __| |/ _ \\\\___ \\| '_ \\| | '_ \\ "+"\n"
-        titre += " | |_) | (_| | |_| |_| |  __/____) | | | | | |_) |"+"\n"
-        titre += " |____/ \\__,_|\\__|\\__|_|\\___|_____/|_| |_|_| .__/"+"\n"
-        titre += "                                           | |"+"\n"
-        titre += "                                           |_|"+"\n"
+        titre += "  ____        _   _   _       _____ _     _" + "\n"
+        titre += " |  _ \\      | | | | | |     / ____| |   (_)" + "\n"
+        titre += " | |_) | __ _| |_| |_| | ___| (___ | |__  _ _ __" + "\n"
+        titre += " |  _ < / _` | __| __| |/ _ \\\\___ \\| '_ \\| | '_ \\ " + "\n"
+        titre += " | |_) | (_| | |_| |_| |  __/____) | | | | | |_) |" + "\n"
+        titre += " |____/ \\__,_|\\__|\\__|_|\\___|_____/|_| |_|_| .__/" + "\n"
+        titre += "                                           | |v." + self.version + "\n"
+        titre += "                                           |_|" + "\n"
         print(titre)
 
 
@@ -332,13 +392,6 @@ if __name__ == "__main__":
     # CONSTANTES
 
     from class_bateau import Bateau
-    RED = Fore.RED
-    BLUE = Fore.BLUE
-    GREEN = Fore.GREEN
-    YELLOW = Fore.YELLOW
-    CYAN = Fore.CYAN
-    WHITE = Fore.WHITE
-    RESET = Fore.RESET
 
     game = Core(10, 10)
     game.affiche(game.grille_joueur_bateau)
