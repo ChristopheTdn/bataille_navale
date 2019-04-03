@@ -1,4 +1,4 @@
-class Bateau():
+class Bateau:
     """
     Gestion de la creation des bateau avec leur nom,
      identifiant taille et position dans la grille
@@ -25,20 +25,22 @@ class Bateau():
 
     def place_bateau(self, grille, largeur, hauteur):
         import random
+
         place_bateau = True
         while place_bateau:
             X = random.randint(1, largeur)
             Y = random.randint(1, hauteur)
             ok = True
-            if grille[(chr(64+X), Y)] != ".":
+            if grille[(chr(64 + X), Y)] != ".":
                 ok = False
             else:
                 # determine horizontal ou vertical
-                if random.randint(1, 2) == 1 and \
-                     (X + self.taille <= largeur):  # horizontal
+                if random.randint(1, 2) == 1 and (
+                    X + self.taille <= largeur
+                ):  # horizontal
                     # test si les cases vont bien
                     for i in range(self.taille):
-                        if grille[((chr(64+X + i)), Y)] != ".":
+                        if grille[((chr(64 + X + i)), Y)] != ".":
                             ok = False
                     if ok:
                         for i in range(self.taille):
@@ -48,7 +50,7 @@ class Bateau():
                             place_bateau = False
                 elif Y + self.taille <= hauteur:
                     for i in range(self.taille):
-                        if grille[((chr(64+X)), Y+i)] != ".":
+                        if grille[((chr(64 + X)), Y + i)] != ".":
                             ok = False
                     if ok:
                         for i in range(self.taille):
@@ -58,16 +60,16 @@ class Bateau():
                             place_bateau = False
 
     def test_tir(self, tir):
-        '''Test le tir du joueur et renvois l'interface avec la mention touche ou coule
+        """Test le tir du joueur et renvois l'interface avec la mention touche ou coule
 
         Arguments:
             tir {str} -- sous la forme LETTRENOMBRE,
                          la lettre va de A a Z et le nombre de 1 a 26
-        '''
+        """
         if tir in self.integrite:
             self.integrite.remove(tir)
 
         if len(self.integrite) == 0:
-            return (self.long_name + " coulé !!!")
+            return self.long_name + " coulé !!!"
         else:
-            return (self.long_name + " touché !!!")
+            return self.long_name + " touché !!!"
